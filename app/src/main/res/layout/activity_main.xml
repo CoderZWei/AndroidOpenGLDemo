@@ -5,9 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
+   <SurfaceView
+       android:id="@+id/mSurfaceView"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent" />
+<!--
    <com.example.zw.liveapp.MyGLSurfaceView
        android:id="@+id/mGLSurfaceView"
        android:layout_width="match_parent"
        android:layout_height="match_parent" />
+       -->
 </android.support.constraint.ConstraintLayout>
