@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import com.example.zw.liveapp.utils.ShaderUtil;
 
@@ -22,11 +23,12 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
             1f, 1f
     };
     private FloatBuffer vertexBuffer;
+    //fbo有自己的坐标系，需要单独设置
     private float[] fragmentData={
-                0f,1f,
-                1f,1f,
-                0f,0f,
-                1f,0f
+            0f, 0f,
+            1f, 0f,
+            0f, 1f,
+            1f, 1f
 //            0f, 0.5f,
 //            0.5f, 0.5f,
 //            0f, 0f,
@@ -36,11 +38,16 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     private int program;
     private int vPosition;
     private int fPosition;
-    private int textureid;
+    private int textureId;
     private int sampler;
 
     //顶点缓冲
     private int vboId;
+    //帧缓冲
+    private int fboId;
+
+    private int imgTextureId;
+    private FboRender fboRender;
 
     public MyTextureRender(Context context) {
         this.mContext=context;
@@ -54,10 +61,12 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
                 .asFloatBuffer()
                 .put(fragmentData);
         fragmentBuffer.position(0);
+        fboRender=new FboRender(context);
     }
 
     @Override
     public void onSurfaceCreated() {
+        fboRender.onCreate();
         String vertexSource=ShaderUtil.getRawResource(mContext,R.raw.vertex_shader);
         String fragmentSource=ShaderUtil.getRawResource(mContext,R.raw.fragment_shader);
         program=ShaderUtil.createProgram(vertexSource,fragmentSource);
@@ -81,13 +90,17 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         //解绑vbo
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
 
+        int[] fbos=new int[1];
+        GLES20.glGenTextures(1,fbos,0);
+        fboId=fbos[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,fboId);
 
         //
-        int[] textureIds=new int[1];
-        GLES20.glGenTextures(1,textureIds,0);
-        textureid=textureIds[0];
+        int[] textures=new int[1];
+        GLES20.glGenTextures(1,textures,0);
+        textureId=textures[0];
 
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glUniform1i(sampler, 0);
@@ -98,28 +111,51 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.img);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
+            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,GLES20.GL_COLOR_ATTACHMENT0,GLES20.GL_TEXTURE_2D,textureId,0);
+        if(GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)!=GLES20.GL_FRAMEBUFFER_COMPLETE){
+            Log.d("zw_debug","fbo failed");
+        }
 
-        bitmap.recycle();
-        bitmap = null;
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
+        imgTextureId=loadTexture(R.mipmap.img);
+    }
+
+    private int loadTexture(int img) {
+        int[] textures=new int[1];
+        GLES20.glGenTextures(1,textures,0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textures[0]);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+        Bitmap bitmap=BitmapFactory.decodeResource(mContext.getResources(),img);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
+        return textures[0];
     }
 
     @Override
     public void onSurfaceChanged(int width, int height) {
         GLES20.glViewport(0,0,width,height);
+        fboRender.onChange(width,height);
+
     }
 
     @Override
     public void onDrawFrame() {
-
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,fboId);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1f,0f, 0f, 1f);
 
         GLES20.glUseProgram(program);
 
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imgTextureId);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,vboId);
         GLES20.glEnableVertexAttribArray(vPosition);
         //从偏移量为0的vbo中取数据
@@ -134,5 +170,8 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
+        fboRender.onDraw(textureId);
     }
 }
