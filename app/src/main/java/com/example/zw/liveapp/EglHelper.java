@@ -27,6 +27,7 @@ public class EglHelper {
             throw new RuntimeException("eglInitialize failed");
         }
         //4
+        //设置窗口属性
         int[] attributes=new int[]{
                 EGL10.EGL_RED_SIZE, 8,
                 EGL10.EGL_GREEN_SIZE, 8,
@@ -56,13 +57,14 @@ public class EglHelper {
         }else {
             mEglContext=mEgl.eglCreateContext(mEglDisplay,configs[0],EGL10.EGL_NO_CONTEXT,null);
         }
-        //7
+        //7 生成surface
         mEglSurface=mEgl.eglCreateWindowSurface(mEglDisplay,configs[0],surface,null);
         //8
         if(!mEgl.eglMakeCurrent(mEglDisplay,mEglSurface,mEglSurface,mEglContext)){
             throw new RuntimeException("eglMakeCurrent failed");
         }
     }
+    //返回上下文 可以实现共享纹理等操作
     public EGLContext getEglContext(){
         return mEglContext;
     }

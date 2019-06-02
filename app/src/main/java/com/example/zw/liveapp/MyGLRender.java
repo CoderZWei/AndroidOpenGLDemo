@@ -6,20 +6,23 @@ import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class MyGLRender implements GLSurfaceView.Renderer {
+public class MyGLRender implements MyEGLSurfaceView.MyGLRender {
+    public MyGLRender() {
+    }
+
     @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    public void onSurfaceCreated() {
 
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0,0,width,height);
+    public void onSurfaceChanged(int width, int height) {
+        GLES20.glViewport(0, 0, width, height);
     }
 
     @Override
-    public void onDrawFrame(GL10 gl) {
+    public void onDrawFrame() {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glClearColor(1.0f,0.0f,0.0f,1.0f);
+        GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     }
 }
