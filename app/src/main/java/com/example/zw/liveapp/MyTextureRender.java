@@ -39,6 +39,9 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     private int textureid;
     private int sampler;
 
+    //顶点缓冲
+    private int vboId;
+
     public MyTextureRender(Context context) {
         this.mContext=context;
         vertexBuffer=ByteBuffer.allocateDirect(vertexData.length*4)
@@ -63,7 +66,24 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         fPosition=GLES20.glGetAttribLocation(program,"f_Position");
         sampler=GLES20.glGetUniformLocation(program,"sTexture");
 
-        int textureIds[]=new int[1];
+        //
+        int [] vbos=new int[1];
+        //创建vbo
+        GLES20.glGenBuffers(1,vbos,0);
+        vboId=vbos[0];
+        //绑定vbo
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,vboId);
+        //分配vbo需要的缓存大小
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,vertexData.length*4+fragmentData.length*4,null,GLES20.GL_STATIC_DRAW);
+        //为vbo设置顶点数据的值
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER,0,vertexData.length*4,vertexBuffer);
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER,vertexData.length*4,fragmentData.length*4,fragmentBuffer);
+        //解绑vbo
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
+
+
+        //
+        int[] textureIds=new int[1];
         GLES20.glGenTextures(1,textureIds,0);
         textureid=textureIds[0];
 
@@ -100,15 +120,19 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glUseProgram(program);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,vboId);
         GLES20.glEnableVertexAttribArray(vPosition);
+        //从偏移量为0的vbo中取数据
         GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
-                vertexBuffer);
+                0);
 
         GLES20.glEnableVertexAttribArray(fPosition);
+        //从偏移量为 vertexData.length*4 的vbo中取数据
         GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
-                fragmentBuffer);
+                vertexData.length*4);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
     }
 }
