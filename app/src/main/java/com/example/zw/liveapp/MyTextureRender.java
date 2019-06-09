@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.zw.liveapp.utils.ShaderUtil;
@@ -49,6 +50,9 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     private int imgTextureId;
     private FboRender fboRender;
 
+    private int umatrix;
+    private float[] matrix=new float[16];
+
     public MyTextureRender(Context context) {
         this.mContext=context;
         vertexBuffer=ByteBuffer.allocateDirect(vertexData.length*4)
@@ -67,13 +71,14 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     @Override
     public void onSurfaceCreated() {
         fboRender.onCreate();
-        String vertexSource=ShaderUtil.getRawResource(mContext,R.raw.vertex_shader);
+        String vertexSource=ShaderUtil.getRawResource(mContext,R.raw.vertex_matrix_shader);
         String fragmentSource=ShaderUtil.getRawResource(mContext,R.raw.fragment_shader);
         program=ShaderUtil.createProgram(vertexSource,fragmentSource);
 
         vPosition=GLES20.glGetAttribLocation(program,"v_Position");
         fPosition=GLES20.glGetAttribLocation(program,"f_Position");
         sampler=GLES20.glGetUniformLocation(program,"sTexture");
+        umatrix=GLES20.glGetUniformLocation(program,"u_Matrix");
 
         //
         int [] vbos=new int[1];
@@ -111,8 +116,10 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
+//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,2160,1080,0,
+//            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
-            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+                GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,GLES20.GL_COLOR_ATTACHMENT0,GLES20.GL_TEXTURE_2D,textureId,0);
         if(GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)!=GLES20.GL_FRAMEBUFFER_COMPLETE){
             Log.d("zw_debug","fbo failed");
@@ -144,7 +151,11 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     public void onSurfaceChanged(int width, int height) {
         GLES20.glViewport(0,0,width,height);
         fboRender.onChange(width,height);
-
+        if(width>height){
+            Matrix.orthoM(matrix, 0, -width / ((height / 1137f) * 640f),  width / ((height / 1137f) * 640f), -1f, 1f, -1f, 1f);
+        }else {
+            Matrix.orthoM(matrix, 0, -1,  1, -height / ((width / 640f) * 1137f), height / ((width / 640f) * 1137f), -1f, 1f);
+        }
     }
 
     @Override
@@ -154,6 +165,7 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glClearColor(1f,0f, 0f, 1f);
 
         GLES20.glUseProgram(program);
+        GLES20.glUniformMatrix4fv(umatrix,1,false,matrix,0);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imgTextureId);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,vboId);

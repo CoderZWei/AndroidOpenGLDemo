@@ -82,7 +82,6 @@ public class FboRender {
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
-
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
 
         GLES20.glEnableVertexAttribArray(vPosition);
