@@ -26,10 +26,16 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     private FloatBuffer vertexBuffer;
     //fbo有自己的坐标系，需要单独设置
     private float[] fragmentData={
-            0f, 0f,
-            1f, 0f,
+            //fbo坐标系
+//            0f, 0f,
+//            1f, 0f,
+//            0f, 1f,
+//            1f, 1f
+            //android纹理坐标系
             0f, 1f,
-            1f, 1f
+            1f, 1f,
+            0f, 0f,
+            1f, 0f
 //            0f, 0.5f,
 //            0.5f, 0.5f,
 //            0f, 0f,
@@ -115,11 +121,12 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-
-//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,2160,1080,0,
-//            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
-                GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+        //横屏
+       GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,2160,1080,0,
+            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+       //竖屏
+//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
+ //               GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,GLES20.GL_COLOR_ATTACHMENT0,GLES20.GL_TEXTURE_2D,textureId,0);
         if(GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)!=GLES20.GL_FRAMEBUFFER_COMPLETE){
             Log.d("zw_debug","fbo failed");
@@ -156,6 +163,8 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         }else {
             Matrix.orthoM(matrix, 0, -1,  1, -height / ((width / 640f) * 1137f), height / ((width / 640f) * 1137f), -1f, 1f);
         }
+        Matrix.rotateM(matrix, 0, 180, 1, 0, 0);
+       // Matrix.rotateM(matrix, 0, 180, 0, 0, 1);
     }
 
     @Override
