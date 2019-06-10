@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 public class MyTextureView extends MyEGLSurfaceView{
+    private MyTextureRender mTextureRender;
     public MyTextureView(Context context) {
         this(context,null);
     }
@@ -14,6 +15,11 @@ public class MyTextureView extends MyEGLSurfaceView{
 
     public MyTextureView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setRender(new MyTextureRender(context));
+        mTextureRender=new MyTextureRender(context);
+        setRender(mTextureRender);
     }
+    public MyTextureRender getTextureRender(){
+        return mTextureRender;
+    }
+
 }

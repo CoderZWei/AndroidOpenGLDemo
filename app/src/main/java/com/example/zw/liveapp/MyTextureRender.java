@@ -58,6 +58,15 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
     private int umatrix;
     private float[] matrix=new float[16];
+    public interface OnRenderCreateListener{
+        void onCreate(int textId);
+    }
+    private OnRenderCreateListener onRenderCreateListener;
+
+    public void setOnRenderCreateListener(OnRenderCreateListener onRenderCreateListener) {
+        this.onRenderCreateListener = onRenderCreateListener;
+    }
+    private int width,height;
 
     public MyTextureRender(Context context) {
         this.mContext=context;
@@ -122,11 +131,11 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         //横屏
-       GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,2160,1080,0,
-            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+//       GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,2160,1080,0,
+//            GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
        //竖屏
-//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
- //               GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,1080,2160,0,
+                GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,null);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,GLES20.GL_COLOR_ATTACHMENT0,GLES20.GL_TEXTURE_2D,textureId,0);
         if(GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)!=GLES20.GL_FRAMEBUFFER_COMPLETE){
             Log.d("zw_debug","fbo failed");
@@ -134,7 +143,10 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
-        imgTextureId=loadTexture(R.mipmap.img);
+        imgTextureId=loadTexture(R.drawable.img2);
+        if(onRenderCreateListener !=null){
+            onRenderCreateListener.onCreate(textureId);
+        }
     }
 
     private int loadTexture(int img) {
@@ -156,8 +168,12 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
     @Override
     public void onSurfaceChanged(int width, int height) {
-        GLES20.glViewport(0,0,width,height);
-        fboRender.onChange(width,height);
+//        GLES20.glViewport(0,0,width,height);
+//        fboRender.onChange(width,height);
+        this.width=width;
+        this.height=height;
+        width=1080;
+        height=2160;
         if(width>height){
             Matrix.orthoM(matrix, 0, -width / ((height / 1137f) * 640f),  width / ((height / 1137f) * 640f), -1f, 1f, -1f, 1f);
         }else {
@@ -169,6 +185,7 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
     @Override
     public void onDrawFrame() {
+        GLES20.glViewport(0,0,1080,2160);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,fboId);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1f,0f, 0f, 1f);

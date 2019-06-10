@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".TextureActivity">
     <com.example.zw.liveapp.MyTextureView
+        android:id="@+id/textureView_above"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/layout_content"/>
+    <LinearLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/textureView_above"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
