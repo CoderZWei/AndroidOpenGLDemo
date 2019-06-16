@@ -1,4 +1,4 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import org.junit.Test;
 

@@ -1,9 +1,9 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import android.content.Context;
 import android.opengl.GLES20;
 
-import com.example.zw.liveapp.utils.ShaderUtil;
+import com.example.zw.AndroidOpenGLDemo.utils.ShaderUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

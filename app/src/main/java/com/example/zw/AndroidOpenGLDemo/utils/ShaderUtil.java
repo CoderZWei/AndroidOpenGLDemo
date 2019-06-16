@@ -1,4 +1,4 @@
-package com.example.zw.liveapp.utils;
+package com.example.zw.AndroidOpenGLDemo.utils;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -7,8 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import javax.microedition.khronos.opengles.GL;
 
 public class ShaderUtil {
     public static String getRawResource(Context context,int rawId){

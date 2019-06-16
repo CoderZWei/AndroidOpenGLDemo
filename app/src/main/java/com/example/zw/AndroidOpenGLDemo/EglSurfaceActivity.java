@@ -1,4 +1,4 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

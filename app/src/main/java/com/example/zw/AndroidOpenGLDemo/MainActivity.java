@@ -1,11 +1,10 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import android.opengl.GLES20;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private SurfaceView mSurfaceView;

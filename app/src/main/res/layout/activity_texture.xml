@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TextureActivity">
-    <com.example.zw.liveapp.MyTextureView
+    <com.example.zw.AndroidOpenGLDemo.MyTextureView
         android:id="@+id/textureView_above"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

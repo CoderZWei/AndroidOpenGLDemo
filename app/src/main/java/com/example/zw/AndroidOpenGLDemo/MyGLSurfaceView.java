@@ -1,7 +1,6 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import android.content.Context;
-import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
 public class MyGLSurfaceView extends MyEGLSurfaceView{
@@ -12,7 +11,7 @@ public class MyGLSurfaceView extends MyEGLSurfaceView{
 
     public MyGLSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setRender(new com.example.zw.liveapp.MyGLRender());
+        setRender(new com.example.zw.AndroidOpenGLDemo.MyGLRender());
         setRenderMode(MyEGLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 

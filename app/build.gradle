@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.zw.liveapp"
+        applicationId "com.example.zw.AndroidOpenGLDemo"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1

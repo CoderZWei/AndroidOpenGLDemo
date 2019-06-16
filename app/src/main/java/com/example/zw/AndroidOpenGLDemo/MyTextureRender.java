@@ -1,6 +1,5 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
-import android.animation.FloatArrayEvaluator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +8,7 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.example.zw.liveapp.utils.ShaderUtil;
+import com.example.zw.AndroidOpenGLDemo.utils.ShaderUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

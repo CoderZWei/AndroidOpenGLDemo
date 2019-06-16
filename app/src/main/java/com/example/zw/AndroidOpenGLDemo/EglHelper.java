@@ -1,4 +1,4 @@
-package com.example.zw.liveapp;
+package com.example.zw.AndroidOpenGLDemo;
 
 import android.opengl.EGL14;
 import android.view.Surface;
