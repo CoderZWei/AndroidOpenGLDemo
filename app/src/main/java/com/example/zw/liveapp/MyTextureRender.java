@@ -21,7 +21,12 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
             -1f, -1f,
             1f, -1f,
             -1f, 1f,
-            1f, 1f
+            1f, 1f,
+            //第二章纹理的坐标
+            -0.5f, -0.5f,
+            0.5f, -0.5f,
+            -0.5f, 0.5f,
+            0.5f, 0.5f
     };
     private FloatBuffer vertexBuffer;
     //fbo有自己的坐标系，需要单独设置
@@ -54,6 +59,7 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
     private int fboId;
 
     private int imgTextureId;
+    private int imgTextureId2;
     private FboRender fboRender;
 
     private int umatrix;
@@ -143,7 +149,8 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
-        imgTextureId=loadTexture(R.drawable.img2);
+        imgTextureId=loadTexture(R.mipmap.img);
+        imgTextureId2=loadTexture(R.mipmap.img1);
         if(onRenderCreateListener !=null){
             onRenderCreateListener.onCreate(textureId);
         }
@@ -192,23 +199,34 @@ public class MyTextureRender implements MyEGLSurfaceView.MyGLRender{
 
         GLES20.glUseProgram(program);
         GLES20.glUniformMatrix4fv(umatrix,1,false,matrix,0);
-
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imgTextureId);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,vboId);
+
+        //绘制第一张图片
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imgTextureId);
         GLES20.glEnableVertexAttribArray(vPosition);
         //从偏移量为0的vbo中取数据
         GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
                 0);
-
         GLES20.glEnableVertexAttribArray(fPosition);
         //从偏移量为 vertexData.length*4 的vbo中取数据
         GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
                 vertexData.length*4);
-
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
+        //绘制第二张图片
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,imgTextureId2);
+        GLES20.glEnableVertexAttribArray(vPosition);
+        GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
+                32);
+        GLES20.glEnableVertexAttribArray(fPosition);
+        GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
+                vertexData.length * 4);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        //
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
 
+        GLES20.glViewport(0,0,width,height);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
         fboRender.onDraw(textureId);
     }
