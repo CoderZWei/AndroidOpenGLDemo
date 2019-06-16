@@ -1,1 +1,1 @@
-# LiveApp
+# AndroidOpenGLDemo
